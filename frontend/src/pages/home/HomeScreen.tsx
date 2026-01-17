@@ -2,13 +2,18 @@ import Navbar from "../../components/Navbar.tsx";
 import { Link } from "react-router-dom";
 import { Info, Play } from "lucide-react";
 import useGetTrendingContent from "../../hooks/useGetTrendingContent.tsx";
+import { useContentStore } from "../../store/content.js";
 import {
   ORIGINAL_IMG_BASE_URL,
-  SMALL_IMG_BASE_URL,
+  MOVIE_CATEGORIES,
+  TV_CATEGORIES,
 } from "../../utils/constant.js";
+import ContentSlider from "../../components/ContentSlider.tsx";
+import { useState } from "react";
 const HomeScreen = () => {
   const { trendingContent } = useGetTrendingContent();
-  console.log("trendingContent", trendingContent);
+  const { contentType } = useContentStore();
+  const [imgLoading, setImgLoading] = useState(true);
   if (!trendingContent)
     return (
       <div className="h-screen text-white relative">
@@ -20,10 +25,19 @@ const HomeScreen = () => {
     <>
       <div className="relative h-screen text-white ">
         <Navbar />
+
+        {/* COOL OPTIMIZATION HACK FOR IMAGES*/}
+        {imgLoading && (
+          <div className="absolute top-0 left-0 w-full h-full bg-black/70 flex items-center justify-center shimmer -z-10"></div>
+        )}
+
         <img
           src={ORIGINAL_IMG_BASE_URL + trendingContent?.backdrop_path}
           alt="Hero Image"
           className="absolute top-0 left-0 w-full h-full object-cover -z-50"
+          onLoad={() => {
+            setImgLoading(false);
+          }}
         />
         <div
           className="absolute top-0 left-0 w-full h-full bg-black/50 -z-50"
@@ -63,6 +77,15 @@ const HomeScreen = () => {
             </Link>
           </div>
         </div>
+      </div>
+      <div className="flex flex-col gap-10 bg-black py-10">
+        {contentType === "movie"
+          ? MOVIE_CATEGORIES.map((category) => (
+              <ContentSlider key={category} category={category} />
+            ))
+          : TV_CATEGORIES.map((category) => (
+              <ContentSlider key={category} category={category} />
+            ))}
       </div>
     </>
   );

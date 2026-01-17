@@ -74,7 +74,7 @@ const Navbar = () => {
             TV Shows
           </Link>
           <Link
-            to={"/"}
+            to={"/history"}
             className="block hover:underline p-2"
             onClick={toggleMobileMenu}
           >
