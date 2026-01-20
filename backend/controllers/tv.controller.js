@@ -23,7 +23,7 @@ export async function getTvTrailers(req, res) {
     res.json({ success: true, trailers: data.results });
   } catch (error) {
     if (error.message.includes("404")) {
-      return res.status(404).send(null);
+      return res.status(404).json({ success: false, message: "TV trailers not found" });
     }
     res.status(500).json({ success: false, message: "Server Error" });
   }
@@ -38,10 +38,10 @@ export async function getTvDetails(req, res) {
     res.json({ success: true, content: data });
   } catch (error) {
     if (error.message.includes("404")) {
-      return res.status(404).send(null);
+      return res.status(404).json({ success: false, message: "TV show not found" });
     }
+    res.status(500).json({ success: false, message: "Server Error" });
   }
-  res.status(500).json({ success: false, message: "Server Error" });
 }
 
 export async function getSimiliarTv(req, res) {

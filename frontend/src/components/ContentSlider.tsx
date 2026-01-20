@@ -1,21 +1,26 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import { useContentStore } from "../store/content.js";
+import { useContentStore } from "../store/content";
 import { Link } from "react-router-dom";
-import { SMALL_IMG_BASE_URL } from "../utils/constant.js";
+import { SMALL_IMG_BASE_URL } from "../utils/constant";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import type { ContentItem } from "../types";
 
-const ContentSlider = ({ category }) => {
+interface ContentSliderProps {
+  category: string;
+}
+
+const ContentSlider: React.FC<ContentSliderProps> = ({ category }) => {
   const { contentType } = useContentStore();
-  const [content, setContent] = useState([]);
-  const [showArrows, setShowArrows] = useState(false);
+  const [content, setContent] = useState<ContentItem[]>([]);
+  const [showArrows, setShowArrows] = useState<boolean>(false);
 
-  const sliderRef = useRef(null);
+  const sliderRef = useRef<HTMLDivElement>(null);
 
-  const formattedCategoryName =
+  const formattedCategoryName: string =
     category.replaceAll("_", " ")[0].toUpperCase() +
     category.replaceAll("_", " ").slice(1);
-  const formattedContentType = contentType === "movie" ? "Movies" : "TV Shows";
+  const formattedContentType: string = contentType === "movie" ? "Movies" : "TV Shows";
 
   useEffect(() => {
     const getContent = async () => {
@@ -34,10 +39,12 @@ const ContentSlider = ({ category }) => {
     }
   };
   const scrollRight = () => {
-    sliderRef.current.scrollBy({
-      left: sliderRef.current.offsetWidth,
-      behavior: "smooth",
-    });
+    if (sliderRef.current) {
+      sliderRef.current.scrollBy({
+        left: sliderRef.current.offsetWidth,
+        behavior: "smooth",
+      });
+    }
   };
   return (
     <div
@@ -52,7 +59,7 @@ const ContentSlider = ({ category }) => {
         className="flex space-x-4 overflow-x-scroll scrollbar-hide "
         ref={sliderRef}
       >
-        {content.map((item) => (
+        {content.map((item: ContentItem) => (
           <Link
             to={`/watch/${item.id}`}
             className="min-w-[250px] relative group"

@@ -2,18 +2,20 @@ import Navbar from "../../components/Navbar.tsx";
 import { Link } from "react-router-dom";
 import { Info, Play } from "lucide-react";
 import useGetTrendingContent from "../../hooks/useGetTrendingContent.tsx";
-import { useContentStore } from "../../store/content.js";
+import { useContentStore } from "../../store/content";
 import {
   ORIGINAL_IMG_BASE_URL,
   MOVIE_CATEGORIES,
   TV_CATEGORIES,
-} from "../../utils/constant.js";
+} from "../../utils/constant";
 import ContentSlider from "../../components/ContentSlider.tsx";
 import { useState } from "react";
+
 const HomeScreen = () => {
   const { trendingContent } = useGetTrendingContent();
   const { contentType } = useContentStore();
-  const [imgLoading, setImgLoading] = useState(true);
+  const [imgLoading, setImgLoading] = useState<boolean>(true);
+
   if (!trendingContent)
     return (
       <div className="h-screen text-white relative">
@@ -21,6 +23,7 @@ const HomeScreen = () => {
         <div className="absolute top-0 left-0 w-full h-full bg-black/70 flex items-center justify-center -z-10 shimmer"></div>
       </div>
     );
+
   return (
     <>
       <div className="relative h-screen text-white ">
@@ -51,12 +54,12 @@ const HomeScreen = () => {
             </h1>
             <p className="mt-2 text-lg">
               {trendingContent?.release_date?.split("-")[0] ||
-                trendingContent?.first_air_date.split("-")[0]}{" "}
+                trendingContent?.first_air_date?.split("-")[0]}{" "}
               | {trendingContent?.adult ? "18+" : "PG-13"}
             </p>
             <p className="mt-4 text-lg">
-              {trendingContent?.overview.length > 200
-                ? trendingContent?.overview.slice(0, 200) + "...."
+              {(trendingContent?.overview && trendingContent.overview.length > 200)
+                ? trendingContent.overview.slice(0, 200) + "...."
                 : trendingContent?.overview}
             </p>
           </div>
@@ -80,10 +83,10 @@ const HomeScreen = () => {
       </div>
       <div className="flex flex-col gap-10 bg-black py-10">
         {contentType === "movie"
-          ? MOVIE_CATEGORIES.map((category) => (
+          ? MOVIE_CATEGORIES.map((category: string) => (
               <ContentSlider key={category} category={category} />
             ))
-          : TV_CATEGORIES.map((category) => (
+          : TV_CATEGORIES.map((category: string) => (
               <ContentSlider key={category} category={category} />
             ))}
       </div>

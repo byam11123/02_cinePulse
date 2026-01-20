@@ -5,7 +5,7 @@ import { ChevronRight } from "lucide-react";
 const AuthScreen = () => {
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     navigate("/signup?email=" + email);
   };
@@ -14,8 +14,8 @@ const AuthScreen = () => {
       {/* nav bar */}
       <header className="max-w-6xl mx-auto flex items-center justify-between p-4 pb-10">
         <img
-          src="/netflix-logo.png"
-          alt="Netflix Logo"
+          src="/cinepulse-logo.png"
+          alt="CinePulse Logo"
           className="w-32 md:w-52"
         />
         <Link to={"/login"} className="text-white bg-red-600 py-1 px-2 rounded">

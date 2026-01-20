@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { useContentStore } from "../store/content.js";
+import { useContentStore } from "../store/content";
 import axios from "axios";
+import type { ContentItem } from "../types";
 
 const useGetTrendingContent = () => {
-  const [trendingContent, setTrendingContent] = useState(null);
+  const [trendingContent, setTrendingContent] = useState<ContentItem | null>(null);
   const { contentType } = useContentStore();
 
   useEffect(() => {

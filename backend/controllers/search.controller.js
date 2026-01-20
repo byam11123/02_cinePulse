@@ -10,7 +10,7 @@ export async function searchPerson(req, res) {
       )}&language=en-US&page=1&include_adult=false`
     );
     if (response.results.length === 0) {
-      return res.status(404).send(null);
+      return res.status(404).json({ success: false, message: "No results found" });
     }
 
     const newEntry = {
@@ -44,7 +44,6 @@ export async function searchPerson(req, res) {
 
     res.status(200).json({ success: true, content: response.results });
   } catch (error) {
-    console.error("Error in searchPerson controller: ", error.message);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 }
@@ -57,7 +56,7 @@ export async function searchMovie(req, res) {
       )}&language=en-US&page=1&include_adult=false`
     );
     if (response.results.length === 0) {
-      return res.status(404).send(null);
+      return res.status(404).json({ success: false, message: "No results found" });
     }
 
     const newEntry = {
@@ -91,7 +90,6 @@ export async function searchMovie(req, res) {
 
     res.status(200).json({ success: true, content: response.results });
   } catch (error) {
-    console.error("Error in searchMovie controller: ", error.message);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 }
@@ -104,7 +102,7 @@ export async function searchTv(req, res) {
       )}&language=en-US&page=1&include_adult=false`
     );
     if (response.results.length === 0) {
-      return res.status(404).send(null);
+      return res.status(404).json({ success: false, message: "No results found" });
     }
 
     const newEntry = {
@@ -138,7 +136,6 @@ export async function searchTv(req, res) {
 
     res.status(200).json({ success: true, content: response.results });
   } catch (error) {
-    console.error("Error in searchTv controller: ", error.message);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 }
@@ -166,7 +163,6 @@ export async function getSearchHistory(req, res) {
 
     res.status(200).json({ success: true, history: uniqueHistory });
   } catch (error) {
-    console.error("Error in getSearchHistory controller: ", error.message);
     res.status(500).json({ success: false, message: "Server Error" });
   }
 }
@@ -183,10 +179,6 @@ export async function removeItemFromSearchHistory(req, res) {
       .status(200)
       .json({ success: true, message: "Item removed from history" });
   } catch (error) {
-    console.error(
-      "Error in removeItemFromSearchHistory controller: ",
-      error.message
-    );
     res.status(500).json({ success: false, message: "Server Error" });
   }
 }

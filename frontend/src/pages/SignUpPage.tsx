@@ -1,17 +1,18 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuthStore } from "../store/authUser.js";
 
 const SignUpPage = () => {
-  const { searchParams } = new URL(document.location);
-  const emailValue = searchParams.get("email");
+  const location = useLocation();
+  const url = new URL(`http://localhost${location.pathname}${location.search}`);
+  const emailValue = url.searchParams.get("email");
 
-  const [email, setEmail] = useState(emailValue || "");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState<string>(emailValue || "");
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
 
   const { signup } = useAuthStore();
-  const handleSignup = (e) => {
+  const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
     signup({ email, username, password });
   };
@@ -19,7 +20,7 @@ const SignUpPage = () => {
     <div className="h-screen w-full hero-bg">
       <header className="max-w-6xl mx-auto flex items-center justify-between p-4">
         <Link to={"/"}>
-          <img src="/netflix-logo.png" alt="Logo" className="w-52" />
+          <img src="/cinepulse-logo.png" alt="Logo" className="w-52" />
         </Link>
       </header>
 

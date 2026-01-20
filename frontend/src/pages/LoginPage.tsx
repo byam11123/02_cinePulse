@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 import { useAuthStore } from "../store/authUser.js";
 
 const LoginPage = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const { login } = useAuthStore();
-  const handleLogin = (e) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle login logic here
     login({ email, password });
@@ -15,7 +15,7 @@ const LoginPage = () => {
     <div className="h-screen w-full hero-bg">
       <header className="max-w-6xl mx-auto flex items-center justify-between p-4">
         <Link to={"/"}>
-          <img src="/netflix-logo.png" alt="Logo" className="w-52" />
+          <img src="/cinepulse-logo.png" alt="Logo" className="w-52" />
         </Link>
       </header>
 

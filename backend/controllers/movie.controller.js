@@ -23,7 +23,7 @@ export async function getMovieTrailers(req, res) {
     res.json({ success: true, trailers: data.results });
   } catch (error) {
     if (error.message.includes("404")) {
-      return res.status(404).send(null);
+      return res.status(404).json({ success: false, message: "Movie trailers not found" });
     }
     res.status(500).json({ success: false, message: "Server Error" });
   }
@@ -38,10 +38,10 @@ export async function getMovieDetails(req, res) {
     res.json({ success: true, content: data });
   } catch (error) {
     if (error.message.includes("404")) {
-      return res.status(404).send(null);
+      return res.status(404).json({ success: false, message: "Movie not found" });
     }
+    res.status(500).json({ success: false, message: "Server Error" });
   }
-  res.status(500).json({ success: false, message: "Server Error" });
 }
 export async function getSimiliarMovies(req, res) {
   const { id } = req.params;

@@ -8,7 +8,7 @@ const NotFoundPage = () => {
     >
       <header className="absolute top-0 left-0 p-4 bg-black w-full ">
         <Link to={"/"}>
-          <img src="/netflix-logo.png" alt="Netflix" className="h-8" />
+          <img src="/cinepulse-logo.png" alt="CinePulse" className="h-8" />
         </Link>
       </header>
       <main className="text-center error-page--content z-10">

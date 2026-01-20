@@ -2,10 +2,11 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { Trash } from "lucide-react";
-import { SMALL_IMG_BASE_URL } from "../utils/constant.js";
+import { SMALL_IMG_BASE_URL } from "../utils/constant";
+import type { SearchEntry } from "../types";
 import toast from "react-hot-toast";
 
-function formatDate(dateString) {
+function formatDate(dateString: string) {
   // Create a Date object from the input date string
   const date = new Date(dateString);
 
@@ -34,7 +35,7 @@ function formatDate(dateString) {
 }
 
 const SearchHistoryPage = () => {
-  const [searchHistory, setSearchHistory] = useState([]);
+  const [searchHistory, setSearchHistory] = useState<SearchEntry[]>([]);
 
   useEffect(() => {
     const getSearchHistory = async () => {
@@ -48,7 +49,7 @@ const SearchHistoryPage = () => {
     };
     getSearchHistory();
   }, []);
-  const handleDelete = async (entry) => {
+  const handleDelete = async (entry: SearchEntry) => {
     try {
       await axios.delete(`/api/v1/search/history/${entry.id}`);
       setSearchHistory(searchHistory.filter((item) => item.id !== entry.id));
@@ -76,7 +77,7 @@ const SearchHistoryPage = () => {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8">Search History</h1>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {searchHistory?.map((entry, index) => (
+          {searchHistory?.map((entry: SearchEntry, index: number) => (
             <div
               key={`${entry.id}-${index}`}
               className="bg-gray-800 p-4 rounded flex items-start"

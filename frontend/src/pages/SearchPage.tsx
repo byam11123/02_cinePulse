@@ -1,29 +1,30 @@
 import { useState } from "react";
-import Navbar from "../components/Navbar.js";
-import { useContentStore } from "../store/content.js";
+import Navbar from "../components/Navbar";
+import { useContentStore } from "../store/content";
 import { Search } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
-import { ORIGINAL_IMG_BASE_URL } from "../utils/constant.js";
+import { ORIGINAL_IMG_BASE_URL } from "../utils/constant";
+import type { ContentItem } from "../types";
 
 const SearchPage = () => {
-  const [activeTab, setActiveTab] = useState("movie");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [results, setResults] = useState([]);
+  const [activeTab, setActiveTab] = useState<string>("movie");
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [results, setResults] = useState<ContentItem[]>([]);
   const { setContentType } = useContentStore();
-  const handleTabClick = (tab) => {
+  const handleTabClick = (tab: string) => {
     setActiveTab(tab);
     setContentType(tab); // Set content type to the selected tab
     setResults([]);
   };
 
-  const handleSearch = async (e) => {
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const res = await axios.get(`/api/v1/search/${activeTab}/${searchTerm}`);
       setResults(res.data.content);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Search error:", error);
       if (error.response?.status === 404) {
         toast.error(
@@ -94,7 +95,7 @@ const SearchPage = () => {
           </button>
         </form>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {results.map((result) => {
+          {results.map((result: ContentItem) => {
             // Skip results that don't have the appropriate image path for the current tab
             if (activeTab === "person" && !result.profile_path) return null;
             if (activeTab !== "person" && !result.poster_path) return null;
@@ -109,11 +110,11 @@ const SearchPage = () => {
                     }}
                   >
                     <img
-                      src={ORIGINAL_IMG_BASE_URL + result.profile_path}
-                      alt={result.name}
+                      src={ORIGINAL_IMG_BASE_URL + (result.profile_path || '')}
+                      alt={result.name || ''}
                       className="max-h-96 rounded mx-auto"
                     />
-                    <h2 className="mt-2 text-xl font-bold">{result.name} </h2>
+                    <h2 className="mt-2 text-xl font-bold">{result.name || ''} </h2>
                   </Link>
                 ) : (
                   <Link
@@ -123,12 +124,12 @@ const SearchPage = () => {
                     }}
                   >
                     <img
-                      src={ORIGINAL_IMG_BASE_URL + result.poster_path}
-                      alt={result.title || result.name}
+                      src={ORIGINAL_IMG_BASE_URL + (result.poster_path || '')}
+                      alt={result.title || result.name || ''}
                       className="w-full h-auto rounded"
                     />
                     <h2 className="mt-2 text-xl font-bold">
-                      {result.title || result.name}
+                      {result.title || result.name || ''}
                     </h2>
                   </Link>
                 )}

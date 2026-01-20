@@ -1,30 +1,30 @@
 import axios from "axios";
-import React, { useEffect, useRef } from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useContentStore } from "../store/content.js";
+import { useContentStore } from "../store/content";
 import Navbar from "../components/Navbar";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   ORIGINAL_IMG_BASE_URL,
   SMALL_IMG_BASE_URL,
-} from "../utils/constant.js";
-import { formatReleaseDate } from "../utils/dateFunction.js";
-import WatchPageSkeleton from "../components/skeletons/WatchPageSkeleton.js";
+} from "../utils/constant";
+import { formatReleaseDate } from "../utils/dateFunction";
+import WatchPageSkeleton from "../components/skeletons/WatchPageSkeleton";
+import type { ContentItem, Trailer } from "../types";
 
 const WatchPage = () => {
-  const { id } = useParams();
-  const [trailers, setTrailers] = useState([]);
-  const [currentTrailersIdx, setCurrentTrailerIdx] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [videoError, setVideoError] = useState(false);
-  const [playerKey, setPlayerKey] = useState(0); // Key to force remount of ReactPlayer
-  const [content, setContent] = useState({});
-  const [similarContent, setSimilarContent] = useState([]);
+  const { id } = useParams<{ id: string }>();
+  const [trailers, setTrailers] = useState<Trailer[]>([]);
+  const [currentTrailersIdx, setCurrentTrailerIdx] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [videoError, setVideoError] = useState<boolean>(false);
+  const [playerKey, setPlayerKey] = useState<number>(0); // Key to force remount of ReactPlayer
+  const [content, setContent] = useState<ContentItem | null>(null);
+  const [similarContent, setSimilarContent] = useState<ContentItem[]>([]);
   const { contentType } = useContentStore();
 
-  const sliderRef = useRef(null);
+  const sliderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const getTrailers = async () => {
@@ -33,7 +33,7 @@ const WatchPage = () => {
         if (res.data.trailers && Array.isArray(res.data.trailers)) {
           // Filter only YouTube trailers that are official and allow embedding
           const youtubeTrailers = res.data.trailers.filter(
-            (trailer) =>
+            (trailer: any) =>
               trailer.site === "YouTube" &&
               (trailer.type === "Trailer" ||
                 trailer.type === "Teaser" ||
@@ -53,7 +53,7 @@ const WatchPage = () => {
         } else {
           setTrailers([]);
         }
-      } catch (error) {
+      } catch (error: any) {
         if (error.message.includes("404")) {
           setTrailers([]);
         } else {
@@ -68,7 +68,7 @@ const WatchPage = () => {
       try {
         const res = await axios.get(`/api/v1/${contentType}/${id}/similar`);
         setSimilarContent(res.data.similar);
-      } catch (error) {
+      } catch (error: any) {
         if (error.message.includes("404")) {
           setSimilarContent([]);
         }
@@ -82,7 +82,7 @@ const WatchPage = () => {
       try {
         const res = await axios.get(`/api/v1/${contentType}/${id}/details`);
         setContent(res.data.content);
-      } catch (error) {
+      } catch (error: any) {
         if (error.message.includes("404")) {
           setContent(null);
         }
@@ -246,9 +246,9 @@ const WatchPage = () => {
               {content?.title || content?.name}
             </h2>
             <p className="mt-2 text-lg">
-              {formatReleaseDate(
-                content?.release_date || content?.first_air_date
-              )}{" "}
+              {content?.release_date || content?.first_air_date ? formatReleaseDate(
+                content.release_date || content.first_air_date || ''
+              ) : ''}{" "}
               {content?.adult ? (
                 <span className="text-red-600">18+</span>
               ) : (
@@ -272,7 +272,7 @@ const WatchPage = () => {
               className="flex overflow-x-scroll scrollbar-hide gap-4 pb-4 group"
               ref={sliderRef}
             >
-              {similarContent.map((content) => {
+              {similarContent.map((content: ContentItem) => {
                 if (content.poster_path === null) return null;
                 return (
                   <Link
