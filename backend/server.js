@@ -13,6 +13,7 @@ import { protectRoute } from "./middleware/protectRoute.js";
 import { requestLogger } from "./middleware/requestLogger.js";
 import { apiRateLimiter, authRateLimiter } from "./middleware/rateLimiter.js";
 import { globalErrorHandler, notFoundHandler } from "./middleware/errorHandler.js";
+import { initializeRedis } from "./utils/cache.js";
 
 dotenv.config();
 
@@ -46,7 +47,11 @@ app.all('*', notFoundHandler);
 // Global error handler - this must be the last middleware
 app.use(globalErrorHandler);
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server running in ${ENV_VARS.NODE_ENV} mode on port ${PORT}`);
+
+  // Initialize Redis cache
+  await initializeRedis();
+
   connectDB();
 });
