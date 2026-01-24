@@ -21,6 +21,7 @@ const SearchPage = () => {
     setActiveTab(tab);
     setContentType(tab); // Set content type to the selected tab
     setResults([]);
+    setSearchTerm("");
   };
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -39,7 +40,7 @@ const SearchPage = () => {
       }
     }
   };
-  console.log("Results : ", results);
+
 
   return (
     <div className="bg-black min-h-screen text-white">
@@ -47,11 +48,10 @@ const SearchPage = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-center gap-3 mb-4">
           <button
-            className={`py-2 px-4 rounded ${
-              activeTab === "movie"
-                ? "bg-red-600 hover:bg-red-700"
-                : "bg-gray-800 hover:bg-red-700"
-            }`}
+            className={`py-2 px-4 rounded ${activeTab === "movie"
+              ? "bg-red-600 hover:bg-red-700"
+              : "bg-gray-800 hover:bg-red-700"
+              }`}
             onClick={() => {
               handleTabClick("movie");
             }}
@@ -59,11 +59,10 @@ const SearchPage = () => {
             Movies
           </button>
           <button
-            className={`py-2 px-4 rounded ${
-              activeTab === "tv"
-                ? "bg-red-600 hover:bg-red-700"
-                : "bg-gray-800 hover:bg-red-700"
-            }`}
+            className={`py-2 px-4 rounded ${activeTab === "tv"
+              ? "bg-red-600 hover:bg-red-700"
+              : "bg-gray-800 hover:bg-red-700"
+              }`}
             onClick={() => {
               handleTabClick("tv");
             }}
@@ -71,11 +70,10 @@ const SearchPage = () => {
             TV Shows
           </button>
           <button
-            className={`py-2 px-4 rounded ${
-              activeTab === "person"
-                ? "bg-red-600 hover:bg-red-700"
-                : "bg-gray-800 hover:bg-red-700"
-            }`}
+            className={`py-2 px-4 rounded ${activeTab === "person"
+              ? "bg-red-600 hover:bg-red-700"
+              : "bg-gray-800 hover:bg-red-700"
+              }`}
             onClick={() => {
               handleTabClick("person");
             }}
