@@ -1,6 +1,6 @@
 import { fetchFromTMDB } from "../services/tmdb.service.js";
 
-export async function getTrendingTv(req, res) {
+export async function getTrendingTv(req, res, next) {
   try {
     const data = await fetchFromTMDB(
       "https://api.themoviedb.org/3/trending/tv/day?language=en-US"
@@ -10,11 +10,11 @@ export async function getTrendingTv(req, res) {
 
     res.json({ success: true, content: randomTv });
   } catch (error) {
-    res.status(500).json({ success: false });
+    next(error);
   }
 }
 
-export async function getTvTrailers(req, res) {
+export async function getTvTrailers(req, res, next) {
   const { id } = req.params;
   try {
     const data = await fetchFromTMDB(
@@ -25,11 +25,11 @@ export async function getTvTrailers(req, res) {
     if (error.message.includes("404")) {
       return res.status(404).json({ success: false, message: "TV trailers not found" });
     }
-    res.status(500).json({ success: false, message: "Server Error" });
+    next(error);
   }
 }
 
-export async function getTvDetails(req, res) {
+export async function getTvDetails(req, res, next) {
   const { id } = req.params;
   try {
     const data = await fetchFromTMDB(
@@ -40,11 +40,11 @@ export async function getTvDetails(req, res) {
     if (error.message.includes("404")) {
       return res.status(404).json({ success: false, message: "TV show not found" });
     }
-    res.status(500).json({ success: false, message: "Server Error" });
+    next(error);
   }
 }
 
-export async function getSimiliarTv(req, res) {
+export async function getSimiliarTv(req, res, next) {
   const { id } = req.params;
   try {
     const data = await fetchFromTMDB(
@@ -52,15 +52,17 @@ export async function getSimiliarTv(req, res) {
     );
     res.json({ success: true, similar: data.results });
   } catch (error) {
-    res.status(500).json({ success: false });
+    next(error);
   }
 }
-export async function getCategoryTvs(req, res) {
+export async function getCategoryTvs(req, res, next) {
   const { category } = req.params;
   try {
     const data = await fetchFromTMDB(
       `https://api.themoviedb.org/3/tv/${category}?language=en-US&page=1`
     );
     res.json({ success: true, content: data.results });
-  } catch (error) {}
+  } catch (error) {
+    next(error);
+  }
 }

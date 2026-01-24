@@ -1,6 +1,6 @@
 import { fetchFromTMDB } from "../services/tmdb.service.js";
 
-export async function getTrendingMovie(req, res) {
+export async function getTrendingMovie(req, res, next) {
   try {
     const data = await fetchFromTMDB(
       "https://api.themoviedb.org/3/trending/movie/day?language=en-US"
@@ -10,11 +10,11 @@ export async function getTrendingMovie(req, res) {
 
     res.json({ success: true, content: randomMovie });
   } catch (error) {
-    res.status(500).json({ success: false });
+    next(error);
   }
 }
 
-export async function getMovieTrailers(req, res) {
+export async function getMovieTrailers(req, res, next) {
   const { id } = req.params;
   try {
     const data = await fetchFromTMDB(
@@ -25,11 +25,11 @@ export async function getMovieTrailers(req, res) {
     if (error.message.includes("404")) {
       return res.status(404).json({ success: false, message: "Movie trailers not found" });
     }
-    res.status(500).json({ success: false, message: "Server Error" });
+    next(error);
   }
 }
 
-export async function getMovieDetails(req, res) {
+export async function getMovieDetails(req, res, next) {
   const { id } = req.params;
   try {
     const data = await fetchFromTMDB(
@@ -40,10 +40,10 @@ export async function getMovieDetails(req, res) {
     if (error.message.includes("404")) {
       return res.status(404).json({ success: false, message: "Movie not found" });
     }
-    res.status(500).json({ success: false, message: "Server Error" });
+    next(error);
   }
 }
-export async function getSimiliarMovies(req, res) {
+export async function getSimiliarMovies(req, res, next) {
   const { id } = req.params;
   try {
     const data = await fetchFromTMDB(
@@ -51,16 +51,18 @@ export async function getSimiliarMovies(req, res) {
     );
     res.json({ success: true, similar: data.results });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+    next(error);
   }
 }
 
-export async function getCategoryMovies(req, res) {
+export async function getCategoryMovies(req, res, next) {
   const { category } = req.params;
   try {
     const data = await fetchFromTMDB(
       `https://api.themoviedb.org/3/movie/${category}?language=en-US&page=1`
     );
     res.json({ success: true, content: data.results });
-  } catch (error) {}
+  } catch (error) {
+    next(error);
+  }
 }

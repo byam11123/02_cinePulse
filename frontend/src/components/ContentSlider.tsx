@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import axios from "axios";
+import apiClient from "../utils/apiClient";
 import { useContentStore } from "../store/content";
 import { Link } from "react-router-dom";
 import { SMALL_IMG_BASE_URL } from "../utils/constant";
@@ -24,7 +24,7 @@ const ContentSlider: React.FC<ContentSliderProps> = ({ category }) => {
 
   useEffect(() => {
     const getContent = async () => {
-      const res = await axios.get(`/api/v1/${contentType}/${category}`);
+      const res = await apiClient.get(`/${contentType}/${category}`);
       setContent(res.data.content);
     };
     getContent();

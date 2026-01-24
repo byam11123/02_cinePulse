@@ -1,4 +1,4 @@
-import axios from "axios";
+import apiClient from "../utils/apiClient";
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { Trash } from "lucide-react";
@@ -44,7 +44,7 @@ const SearchHistoryPage = () => {
   useEffect(() => {
     const getSearchHistory = async () => {
       try {
-        const res = await axios.get(`/api/v1/search/history`);
+        const res = await apiClient.get(`/search/history`);
         setSearchHistory(res.data.history);
       } catch (error) {
         console.log(error);
@@ -55,7 +55,7 @@ const SearchHistoryPage = () => {
   }, []);
   const handleDelete = async (entry: SearchEntry) => {
     try {
-      await axios.delete(`/api/v1/search/history/${entry.id}`);
+      await apiClient.delete(`/search/history/${entry.id}`);
       setSearchHistory(searchHistory.filter((item) => item.id !== entry.id));
     } catch (error) {
       toast.error("Failed to delete search item");

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { useContentStore } from "../store/content";
 import { Search } from "lucide-react";
-import axios from "axios";
+import apiClient from "../utils/apiClient";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 import { ORIGINAL_IMG_BASE_URL } from "../utils/constant";
@@ -26,7 +26,7 @@ const SearchPage = () => {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const res = await axios.get(`/api/v1/search/${activeTab}/${searchTerm}`);
+      const res = await apiClient.get(`/search/${activeTab}/${searchTerm}`);
       setResults(res.data.content);
     } catch (error: any) {
       console.error("Search error:", error);

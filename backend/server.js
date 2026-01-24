@@ -8,7 +8,7 @@ import { connectDB } from "./config/db.js";
 import cookieParser from "cookie-parser";
 import { protectRoute } from "./middleware/protectRoute.js";
 import { requestLogger } from "./middleware/requestLogger.js";
-import { apiRateLimiter, authRateLimiter } from "./middleware/rateLimiter.js";
+import { apiRateLimiter, authRateLimiter, generalRateLimiter } from "./middleware/rateLimiter.js";
 import { globalErrorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 import { initializeRedis } from "./utils/cache.js";
 import { apiVersioning, handleDeprecatedVersion } from "./middleware/apiVersioning.js";
@@ -30,26 +30,53 @@ app.use(requestLogger);
 app.use(apiVersioning);
 app.use(handleDeprecatedVersion);
 
+// Conditionally apply general rate limiting based on environment
+if (ENV_VARS.NODE_ENV === 'production') {
+  app.use("/api", generalRateLimiter);
+}
+
 app.use(express.json());
 app.use(cookieParser());
 
-// Apply rate limiting appropriately - these need to be applied before the routes
-app.use("/api/v1/auth", authRateLimiter, authRoutes);
-app.use("/api/v1/movie", apiRateLimiter, protectRoute, movieRoutes);
-app.use("/api/v1/tv", apiRateLimiter, protectRoute, tvRoutes);
-app.use("/api/v1/search", apiRateLimiter, protectRoute, searchRoutes);
+// Conditionally apply rate limiting based on environment
+if (ENV_VARS.NODE_ENV === 'production') {
+  // Apply rate limiting in production
+  app.use("/api/v1/auth", authRateLimiter, authRoutes);
+  app.use("/api/v1/movie", apiRateLimiter, protectRoute, movieRoutes);
+  app.use("/api/v1/tv", apiRateLimiter, protectRoute, tvRoutes);
+  app.use("/api/v1/search", apiRateLimiter, protectRoute, searchRoutes);
+} else {
+  // Skip rate limiting in development for easier testing
+  app.use("/api/v1/auth", authRoutes);
+  app.use("/api/v1/movie", protectRoute, movieRoutes);
+  app.use("/api/v1/tv", protectRoute, tvRoutes);
+  app.use("/api/v1/search", protectRoute, searchRoutes);
+}
+
 app.use("/api/v1/health", healthRoutes);
 
+// Static file serving for production
 if (ENV_VARS.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "/frontend/dist")));
 
-  app.get(/.*/, (req, res) => {
+  // Serve frontend for all routes in production (except API)
+  app.get(/^(?!\/api\/)/, (req, res) => {
     res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
   });
+} else {
+  // In development, don't serve frontend files
+  // API routes will be handled normally
 }
 
-// Catch-all route for undefined routes
-app.all(/.*/, notFoundHandler);
+// Catch-all route for undefined API routes
+app.use((req, res, next) => {
+  if (req.originalUrl.startsWith('/api/')) {
+    notFoundHandler(req, res, next);
+  } else {
+    // For non-API routes in development, return a simple message
+    res.status(404).json({ success: false, message: 'Page not found. Frontend is served separately in development.' });
+  }
+});
 
 // Global error handler - this must be the last middleware
 app.use(globalErrorHandler);

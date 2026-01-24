@@ -1,4 +1,4 @@
-import axios from "axios";
+import apiClient from "../utils/apiClient";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useContentStore } from "../store/content";
@@ -35,7 +35,7 @@ const WatchPage = () => {
   useEffect(() => {
     const getTrailers = async () => {
       try {
-        const res = await axios.get(`/api/v1/${contentType}/${id}/trailers`);
+        const res = await apiClient.get(`/${contentType}/${id}/trailers`);
         if (res.data.trailers && Array.isArray(res.data.trailers)) {
           // Filter only YouTube trailers that are official and allow embedding
           const youtubeTrailers = res.data.trailers.filter(
@@ -72,7 +72,7 @@ const WatchPage = () => {
   useEffect(() => {
     const getSimilarContent = async () => {
       try {
-        const res = await axios.get(`/api/v1/${contentType}/${id}/similar`);
+        const res = await apiClient.get(`/${contentType}/${id}/similar`);
         setSimilarContent(res.data.similar);
       } catch (error: any) {
         if (error.message.includes("404")) {
@@ -86,7 +86,7 @@ const WatchPage = () => {
   useEffect(() => {
     const getContentDeatils = async () => {
       try {
-        const res = await axios.get(`/api/v1/${contentType}/${id}/details`);
+        const res = await apiClient.get(`/${contentType}/${id}/details`);
         setContent(res.data.content);
       } catch (error: any) {
         if (error.message.includes("404")) {
