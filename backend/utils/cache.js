@@ -19,27 +19,13 @@ const initializeRedis = async () => {
       logger.error('Redis Client Error', { error: err.message });
     });
 
-    // Connect with a 5-second timeout to prevent hanging
-    const connectPromise = redisClient.connect();
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Redis connection timeout')), 5000)
-    );
-
-    await Promise.race([connectPromise, timeoutPromise]);
+    await redisClient.connect();
     logger.info('Connected to Redis successfully');
 
     return redisClient;
   } catch (error) {
     logger.error('Failed to connect to Redis', { error: error.message });
-    // Cleanup: Ensure redisClient is null so the app falls back to memory cache
-    try {
-      if (redisClient) {
-        await redisClient.disconnect();
-      }
-    } catch (e) {
-      // Ignore disconnect errors
-    }
-    redisClient = null;
+    // Fallback: continue without Redis cache
     return null;
   }
 };

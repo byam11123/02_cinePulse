@@ -100,46 +100,33 @@ app.use((req, res, next) => {
 app.use(globalErrorHandler);
 
 // ✅ Fix: Database & Redis connection singleton for serverless
-let connectionPromise = null;
-const connectOnce = () => {
-  if (!connectionPromise) {
-    connectionPromise = (async () => {
+let isConnected = false;
+const connectOnce = async () => {
+  if (!isConnected) {
+    try {
+      await connectDB();
+
+      // Optional: Initialize Redis if available
       try {
-        await connectDB();
-
-        // Optional: Initialize Redis if available
-        try {
-          await initializeRedis();
-        } catch (redisError) {
-          console.log(
-            "Redis initialization skipped or failed:",
-            redisError.message,
-          );
-          // Don't fail if Redis isn't available
-        }
-
-        console.log("Database initialized successfully");
-      } catch (error) {
-        console.error("Database connection failed:", error);
-        connectionPromise = null; // Allow retry on next request
-        throw error;
+        await initializeRedis();
+      } catch (redisError) {
+        console.log(
+          "Redis initialization skipped or failed:",
+          redisError.message,
+        );
+        // Don't fail if Redis isn't available
       }
-    })();
+
+      isConnected = true;
+      console.log("Database initialized successfully");
+    } catch (error) {
+      console.error("Database connection failed:", error);
+      throw error;
+    }
   }
-  return connectionPromise;
 };
 
-// Middleware to ensure DB is connected before handling requests
-app.use(async (req, res, next) => {
-  try {
-    await connectOnce();
-    next();
-  } catch (error) {
-    res.status(503).json({ success: false, message: "Database connection failed. Please try again." });
-  }
-});
-
-// ✅ Fix: Connect immediately for serverless cold start (non-blocking)
+// ✅ Fix: Connect immediately for serverless cold start
 connectOnce();
 
 // ✅ Fix: Only start server locally (Vercel doesn't use app.listen)
