@@ -31,7 +31,15 @@ const initializeRedis = async () => {
     return redisClient;
   } catch (error) {
     logger.error('Failed to connect to Redis', { error: error.message });
-    // Fallback: continue without Redis cache
+    // Cleanup: Ensure redisClient is null so the app falls back to memory cache
+    try {
+      if (redisClient) {
+        await redisClient.disconnect();
+      }
+    } catch (e) {
+      // Ignore disconnect errors
+    }
+    redisClient = null;
     return null;
   }
 };
