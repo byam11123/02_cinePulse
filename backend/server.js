@@ -100,33 +100,46 @@ app.use((req, res, next) => {
 app.use(globalErrorHandler);
 
 // ✅ Fix: Database & Redis connection singleton for serverless
-let isConnected = false;
-const connectOnce = async () => {
-  if (!isConnected) {
-    try {
-      await connectDB();
-
-      // Optional: Initialize Redis if available
+let connectionPromise = null;
+const connectOnce = () => {
+  if (!connectionPromise) {
+    connectionPromise = (async () => {
       try {
-        await initializeRedis();
-      } catch (redisError) {
-        console.log(
-          "Redis initialization skipped or failed:",
-          redisError.message,
-        );
-        // Don't fail if Redis isn't available
-      }
+        await connectDB();
 
-      isConnected = true;
-      console.log("Database initialized successfully");
-    } catch (error) {
-      console.error("Database connection failed:", error);
-      throw error;
-    }
+        // Optional: Initialize Redis if available
+        try {
+          await initializeRedis();
+        } catch (redisError) {
+          console.log(
+            "Redis initialization skipped or failed:",
+            redisError.message,
+          );
+          // Don't fail if Redis isn't available
+        }
+
+        console.log("Database initialized successfully");
+      } catch (error) {
+        console.error("Database connection failed:", error);
+        connectionPromise = null; // Allow retry on next request
+        throw error;
+      }
+    })();
   }
+  return connectionPromise;
 };
 
-// ✅ Fix: Connect immediately for serverless cold start
+// Middleware to ensure DB is connected before handling requests
+app.use(async (req, res, next) => {
+  try {
+    await connectOnce();
+    next();
+  } catch (error) {
+    res.status(503).json({ success: false, message: "Database connection failed. Please try again." });
+  }
+});
+
+// ✅ Fix: Connect immediately for serverless cold start (non-blocking)
 connectOnce();
 
 // ✅ Fix: Only start server locally (Vercel doesn't use app.listen)
