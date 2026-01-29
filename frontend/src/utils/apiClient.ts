@@ -7,7 +7,7 @@ axios.defaults.withCredentials = true;
 const apiClient = axios.create({
   baseURL: '/api/v1',
   withCredentials: true,
-  timeout: 10000, // 10 second timeout
+  timeout: 30000, // 30 second timeout
 });
 
 // Add request interceptor to ensure credentials are always included

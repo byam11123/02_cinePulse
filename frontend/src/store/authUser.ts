@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import axios from "axios";
+import apiClient from "../utils/apiClient";
 import { toast } from "react-hot-toast";
 import type { AuthState } from "../types";
 
@@ -12,7 +12,7 @@ export const useAuthStore = create<AuthState>()((set) => ({
   signup: async (credentials: { username: string; email: string; password: string }) => {
     set({ isSigningUp: true });
     try {
-      const response = await axios.post("/api/v1/auth/signup", credentials);
+      const response = await apiClient.post("/auth/signup", credentials);
       set({ user: response.data.user, isSigningUp: false });
       toast.success("Account created successfully");
       return response.data;
@@ -24,7 +24,7 @@ export const useAuthStore = create<AuthState>()((set) => ({
   login: async (credentials: { email: string; password: string }) => {
     set({ isLogginIn: true });
     try {
-      const response = await axios.post("/api/v1/auth/login", credentials);
+      const response = await apiClient.post("/auth/login", credentials);
 
       set({ user: response.data.user, isLogginIn: false });
       toast.success("Logged in successfully");
@@ -36,7 +36,7 @@ export const useAuthStore = create<AuthState>()((set) => ({
   logout: async () => {
     set({ isLoggingOut: true });
     try {
-      await axios.post("/api/v1/auth/logout");
+      await apiClient.post("/auth/logout");
       set({ user: null, isLoggingOut: false });
       toast.success("Logged out successfully");
     } catch (error: any) {
@@ -48,7 +48,7 @@ export const useAuthStore = create<AuthState>()((set) => ({
     set({ isCheckingAuth: true });
 
     try {
-      const response = await axios.get("/api/v1/auth/authCheck");
+      const response = await apiClient.get("/auth/authCheck");
       set({ user: response.data.user, isCheckingAuth: false });
     } catch (error: any) {
       set({ user: null, isCheckingAuth: false });

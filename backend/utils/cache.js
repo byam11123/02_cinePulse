@@ -19,7 +19,13 @@ const initializeRedis = async () => {
       logger.error('Redis Client Error', { error: err.message });
     });
 
-    await redisClient.connect();
+    // Connect with a 5-second timeout to prevent hanging
+    const connectPromise = redisClient.connect();
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Redis connection timeout')), 5000)
+    );
+
+    await Promise.race([connectPromise, timeoutPromise]);
     logger.info('Connected to Redis successfully');
 
     return redisClient;
@@ -64,7 +70,7 @@ const cacheMiddleware = (keyPrefix, expirationTime = 3600) => {
       // If not in any cache, continue to the route handler
       // Override res.json to cache the response
       const originalJson = res.json;
-      res.json = function(data) {
+      res.json = function (data) {
         // Cache the response data in both Redis and memory
         if (redisClient) {
           redisClient.setEx(cacheKey, expirationTime, JSON.stringify(data))
